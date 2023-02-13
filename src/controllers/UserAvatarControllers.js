@@ -19,11 +19,11 @@ class UserAvatarControllers{
       await diskStorage.deleteFile(user.avatar)
     }
 
-    const fileName = await diskStorage.saveFile(avatarFilename)
-    user.avatar = fileName
+    const filename = await diskStorage.saveFile(avatarFilename)
+    user.avatar = filename
 
     await knex('users').update(user).where({id: user_id})
-    
+
     return res.json(user)
   }
 

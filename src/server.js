@@ -1,7 +1,7 @@
 const express = require('express')
 const AppError = require('./utils/AppError')
 const routes = require('./routes')
-const uploadConfig = require('../configs/upload')
+const uploadConfig = require('./configs/upload')
 
 const app = express()
 
