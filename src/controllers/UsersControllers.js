@@ -19,11 +19,9 @@ class UsersControllers {
 
   async update(req, res) {
     const { name, email, password, old_password } = req.body
-    const { id } = req.params
+    const user_id = req.user.id
 
-    const user = await knex('users').where({ id }).first()
-
-    console.log(user)
+    const user = await knex('users').where( {id: user_id} ).first()
 
     if (!user) {
       return res.status(404).json('usuário nao encontrado')
@@ -54,7 +52,7 @@ class UsersControllers {
 
 
     await knex('users')
-      .where({ id })
+      .where( {id: user_id} )
       .update({ 
         name: name ?? user.name, 
         email: email ?? user.email, 
