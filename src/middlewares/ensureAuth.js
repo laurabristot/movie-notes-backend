@@ -18,6 +18,8 @@ function ensureAuth(req, res, next) {
 
     return next()
   } catch (error) {
+    
+    console.log(error)
     return res.json("JWT Token inválido")
   }
 }
