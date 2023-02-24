@@ -58,20 +58,19 @@ class MovieNotesControllers {
     const { id } = req.params
 
     const notes = await knex('movie_notes').where({id}).first()
+    const tags = await knex('movie_tags').where({ notes_id: id }).orderBy('name')
 
-    return res.json(notes)
+    return res.json({...notes, tags})
   }
 
   async index(req, res) {
-    const {title} = req.query
+    const {title} = req.params
     const user_id = req.user.id
 
    
     let notes = await knex('movie_notes')
     .where({ user_id })
-    .whereLike('notes.title', `%${title}%`)
-    .groupBy('notes.id')
-    .orderBy('notes.title')
+    .orderBy('title')
 
     if (!notes) {
       return res.status(404).json('notes nao encontrado')
