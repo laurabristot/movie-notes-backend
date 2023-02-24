@@ -3,7 +3,12 @@ const knex = require('../database/knex')
 class MovieNotesControllers {
   async create(req, res) {
     const { title, description, rating, tags } = req.body
-    const { user_id } = req.params
+    const user_id = req.user.id
+
+
+    if (rating > 5 || rating < 1) {
+      return res.json('nota inválida, digite uma nota entre 1 e 5')
+    }
 
     const notes_id = await knex('movie_notes').insert({
       title,
@@ -11,10 +16,6 @@ class MovieNotesControllers {
       rating,
       user_id
     })
-
-    if (rating > 5 || rating < 1) {
-      return res.json('nota inválida, digite uma nota entre 1 e 5')
-    }
 
     const tagsInsert = await tags.map(name => {
      return{
@@ -48,21 +49,29 @@ class MovieNotesControllers {
       .update({ 
         title: title ?? movie_notes.title, 
         rating: rating ?? movie_notes.rating, 
-        description: movie_notes.description ?? movie_notes.description })
+        description: description ?? movie_notes.description })
 
     return res.json()
   }
 
-  async getAll(req, res) {
-    const notes = await knex('movie_notes')
+  async show(req, res) {
+    const { id } = req.params
+
+    const notes = await knex('movie_notes').where({id}).first()
 
     return res.json(notes)
   }
 
-  async getById(req, res) {
-    const { id } = req.params
+  async index(req, res) {
+    const {title} = req.query
+    const user_id = req.user.id
 
-    const notes = await knex('movie_notes').where({ id }).first()
+   
+    let notes = await knex('movie_notes')
+    .where({ user_id })
+    .whereLike('notes.title', `%${title}%`)
+    .groupBy('notes.id')
+    .orderBy('notes.title')
 
     if (!notes) {
       return res.status(404).json('notes nao encontrado')

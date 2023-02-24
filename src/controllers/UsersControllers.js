@@ -21,15 +21,15 @@ class UsersControllers {
     const { name, email, password, old_password } = req.body
     const user_id = req.user.id
 
-    const user = await knex('users').where( {id: user_id} ).first()
+    const user = await knex('users').where({ id: user_id }).first()
 
     if (!user) {
       return res.status(404).json('usuário nao encontrado')
     }
 
-    if (!old_password) {
+    if (old_password && !old_password) {
       return res.json(
-        'Você precisa informar a senha antiga para definir uma nova senha'
+        'Você precisa informar a senha antiga para definir a nova senha'
       )
     }
 
@@ -42,21 +42,21 @@ class UsersControllers {
       user.password = await hash(password, 8)
     }
 
+    const checkIfEmailExists = await knex('users')
+      .where({ email: user.email })
+      .first()
 
-    const checkIfEmailExists = await knex('users').where({email: user.email}).first()
-
-
-    if(user.email === checkIfEmailExists){
-      return res.status(404).json("este email ja está em uso")
+    if (user.email === checkIfEmailExists) {
+      return res.status(404).json('este email ja está em uso')
     }
 
-
     await knex('users')
-      .where( {id: user_id} )
-      .update({ 
-        name: name ?? user.name, 
-        email: email ?? user.email, 
-        password: user.password })
+      .where({ id: user_id })
+      .update({
+        name: name ?? user.name,
+        email: email ?? user.email,
+        password: password ?? user.password
+      })
 
     return res.json()
   }
@@ -70,15 +70,13 @@ class UsersControllers {
   async getById(req, res) {
     const { id } = req.params
 
-    const users = await knex('users').where({id}).first()
+    const users = await knex('users').where({ id }).first()
 
-    if(!users){
-      return res.status(404).json("usuário nao encontrado")
+    if (!users) {
+      return res.status(404).json('usuário nao encontrado')
     }
-    
 
-  
-  return res.json(users)
+    return res.json(users)
   }
 
   async delete(req, res) {
