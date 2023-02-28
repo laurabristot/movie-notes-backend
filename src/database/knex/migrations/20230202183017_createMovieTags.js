@@ -3,7 +3,7 @@ exports.up = knex =>
     table.increments('id').primary()
     table.text('name')
     table.integer('user_id').references('id').inTable('users')
-    table.integer('notes_id').references('id').inTable('movie_notes')
+    table.integer('notes_id').references('id').inTable('movie_notes').onDelete("CASCADE")
   })
 
 exports.down = knex => knex.schema.dropTable('movie_tags')
